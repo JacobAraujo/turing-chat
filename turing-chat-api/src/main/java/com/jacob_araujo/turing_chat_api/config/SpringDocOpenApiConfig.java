@@ -15,8 +15,8 @@ public class SpringDocOpenApiConfig {
         return new OpenAPI()
                 .info(
                         new Info()
-                                .title("REST API - Message to Future")
-                                .description("API to menage messages to future")
+                                .title("REST API - Turing Chat")
+                                .description("API to menage users in a chat application")
                                 .version("v1")
                                 .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0"))
                                 .contact(new Contact().name("Jacob Araujo").email("jacobalexandredev@gmail.com"))

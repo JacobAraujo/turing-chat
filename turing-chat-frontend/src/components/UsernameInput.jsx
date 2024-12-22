@@ -1,54 +1,37 @@
-import React, { useState } from "react";
-import Chat from "./Chat";
+import React, { useState, useEffect } from "react";
 
-const UsernameInput = ({ groupId }) => {
+const UsernameInput = ({ onUsernameSubmitted }) => {
     const [username, setUsername] = useState("");
-    const [isChatVisible, setIsChatVisible] = useState(false);
+
+    useEffect(() => {
+        // Gera um nome de usuário padrão quando o componente é montado
+        const defaultUsername = `user${Math.floor(1000 + Math.random() * 9000)}`;
+        setUsername(defaultUsername);
+    }, []);
 
     const handleEnterChat = () => {
         if (username.trim()) {
-            setIsChatVisible(true); // Exibe o chat após o username ser definido
+            onUsernameSubmitted(username);
         } else {
             alert("Por favor, insira um nome de usuário.");
         }
     };
 
     return (
-        <div>
-            {!isChatVisible ? (
-                <div style={{ textAlign: "center", marginTop: "20px" }}>
-                    <h2>Bem-vindo ao Chat</h2>
-                    <input
-                        type="text"
-                        placeholder="Digite seu nome de usuário"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        style={{
-                            padding: "10px",
-                            fontSize: "16px",
-                            borderRadius: "5px",
-                            border: "1px solid #ccc",
-                            marginRight: "10px",
-                        }}
-                    />
-                    <button
-                        onClick={handleEnterChat}
-                        style={{
-                            padding: "10px 15px",
-                            fontSize: "16px",
-                            borderRadius: "5px",
-                            backgroundColor: "#007BFF",
-                            color: "white",
-                            border: "none",
-                            cursor: "pointer",
-                        }}
-                    >
-                        Entrar no Chat
-                    </button>
-                </div>
-            ) : (
-                <Chat groupId={groupId} username={username} />
-            )}
+        <div className="flex flex-col items-center">
+            <input
+                type="text"
+                placeholder="Digite seu nome de usuário"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <button
+                onClick={handleEnterChat}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg transform hover:scale-105"
+            >
+                Entrar no Chat
+            </button>
         </div>
     );
 };

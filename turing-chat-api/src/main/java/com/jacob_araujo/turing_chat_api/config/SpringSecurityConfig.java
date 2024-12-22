@@ -17,28 +17,31 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.List;
 
-
 @EnableMethodSecurity
-@EnableWebMvc
 @Configuration
 public class SpringSecurityConfig {
 
     private static final String[] DOCUMENTATION_OPENAPI = {
             "/docs/index.html",
-            "/docs-message-to-future-api.html", "/docs-message-to-future-api/**",
+            "/docs-message-to-future-api.html",
+            "/docs-message-to-future-api/**",
             "/v3/api-docs/**",
-            "/swagger-ui-custom.html", "/swagger-ui.html", "/swagger-ui/**",
-            "/**.html", "/webjars/**", "/configuration/**", "/swagger-resources/**"
+            "/swagger-ui-custom.html",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/**.html",
+            "/webjars/**",
+            "/configuration/**",
+            "/swagger-resources/**"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf  -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
@@ -48,35 +51,36 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "api/v1/users/forgot-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "api/v1/users/reset-password").permitAll()
                         .requestMatchers(HttpMethod.GET, "api/v1/users/verify-email/*").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers(DOCUMENTATION_OPENAPI).permitAll()
                         .anyRequest().authenticated()
-                ).sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).addFilterBefore(
-                        jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class
-                ).exceptionHandling( ex -> ex
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                ).build();
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+                .build();
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); 
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of("https://studious-carnival-wgjprg4rqw725g96-5173.app.github.dev"));
+        config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
+        config.addExposedHeader("Access-Control-Allow-Private-Network");
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 
     @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -84,5 +88,4 @@ public class SpringSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
 }
